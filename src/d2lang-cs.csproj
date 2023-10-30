@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>d2</RootNamespace>
+    <PackageId>d2lang-cs</PackageId>
+    <Version>0.0.1</Version>
+    <VersionSuffix>alpha</VersionSuffix>
+    <Authors>Stephan van Stekelenburg</Authors>
+    <RepositoryUrl>https://github.com/Stephanvs/d2lang-cs.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Stephanvs/d2lang-cs</PackageProjectUrl>
+    <PackageTags>D2;D2 Lang;Declarative Diagramming;Diagram;Text Diagram;Text to Diagram</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>D2 is A modern, open-source DSL designed specifically for software architecture diagrams.</Description>
+    <PackageIcon>d2_logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../docs/assets/img/d2_logo.png" Pack="true" PackagePath="\" />
+    <None Include="../README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+</Project>
