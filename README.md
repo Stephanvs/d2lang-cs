@@ -72,5 +72,15 @@ google -> alphabet: BELONGS_TO
 - [Kreshnik/d2lang-js](https://github.com/Kreshnik/d2lang-js)
 - [MrBlenny/py-d2](https://github.com/MrBlenny/py-d2)
 
-# License
-MIT License
+# Thank me!
+If you like what I'm doing and you would like to thank me, please consider:
+
+<a href="https://www.buymeacoffee.com/stephanvs" target="_blank">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee!" style="height: 60px !important;width: 217px !important;" >
+</a>
+
+Thank you for your support!
+
+<hr />
+
+Copyright &copy; 2023 [Stephan van Stekelenburg](https://stephanvs.com) - Provided under [MIT License](LICENSE)
