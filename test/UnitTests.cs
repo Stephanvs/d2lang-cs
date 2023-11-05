@@ -17,7 +17,23 @@ public class UnitTests
 
     var diagram = new D2Diagram(new[] { umbrella, company }, new[] { connection });
     var actual = diagram.ToString();
+    var expected = @"alphabet: Alphabet Inc {
+  shape: rectangle
+}
+google: Google {
+  gmail: Gmail {
+    shape: rectangle
+  }
+  meet: Meet {
+    shape: rectangle
+  }
+  deepmind: DeepMind {
+    shape: rectangle
+  }
+  shape: rectangle
+}
+google -> alphabet: BELONGS_TO";
 
-    Assert.AreEqual("expected", actual);
+    Assert.AreSame(expected, actual);
   }
 }
