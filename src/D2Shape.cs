@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace d2;
 
 public record class D2Shape(
@@ -6,7 +8,7 @@ public record class D2Shape(
   Shape? Shape = default,
   D2Style? Style = default,
   string? Near = default
-)
+) : IEnumerable<D2Shape>, IEnumerable<D2Connection>, IEnumerable<D2Text>
 {
   private readonly List<D2Shape> _shapes = new();
   private readonly List<D2Connection> _connections = new();
@@ -53,4 +55,16 @@ public record class D2Shape(
 
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
+
+    public IEnumerator<D2Shape> GetEnumerator()
+		=> _shapes.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator()
+		=> GetEnumerator();
+
+    IEnumerator<D2Text> IEnumerable<D2Text>.GetEnumerator()
+		=> _texts.GetEnumerator();
+
+    IEnumerator<D2Connection> IEnumerable<D2Connection>.GetEnumerator()
+		=> _connections.GetEnumerator();
 }
