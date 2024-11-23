@@ -7,11 +7,12 @@ public class UnitTests
   public void TestDiagram()
   {
     var umbrella = new D2Shape("alphabet", "Alphabet Inc", Shape.Rectangle);
-    var company = new D2Shape("google", "Google", Shape.Rectangle);
-
-    company.Add(new D2Shape("gmail", "Gmail", Shape.Rectangle));
-    company.Add(new D2Shape("meet", "Meet", Shape.Rectangle));
-    company.Add(new D2Shape("deepmind", "DeepMind", Shape.Rectangle));
+    var company = new D2Shape("google", "Google", Shape.Rectangle)
+	{
+		new D2Shape("gmail", "Gmail", Shape.Rectangle),
+		new D2Shape("meet", "Meet", Shape.Rectangle),
+		new D2Shape("deepmind", "DeepMind", Shape.Rectangle),
+	};
 
     var connection = new D2Connection(company.Name, umbrella.Name, Direction.TO, "BELONGS_TO");
 
@@ -34,6 +35,6 @@ google: Google {
 }
 google -> alphabet: BELONGS_TO";
 
-    Assert.AreSame(expected, actual);
+    Assert.AreEqual(expected, actual);
   }
 }
