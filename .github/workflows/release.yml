@@ -1,0 +1,83 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nuget-publish
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  publish:
+    name: Build, validate, and publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: nuget.org
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve and validate package version
+        id: package
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$ ]]; then
+            echo "Version '$version' is not a supported semantic version." >&2
+            exit 1
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore d2lang-cs.sln
+
+      - name: Test
+        run: dotnet test test/Tests.csproj --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Pack with package validation
+        run: >-
+          dotnet pack src/d2lang-cs.csproj
+          --configuration Release
+          --no-restore
+          --output artifacts/packages
+          -p:PackageVersion=${{ steps.package.outputs.version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:EnablePackageValidation=true
+          -p:IncludeSymbols=true
+          -p:SymbolPackageFormat=snupkg
+
+      - name: Upload release packages
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: d2lang-cs-${{ steps.package.outputs.version }}
+          path: artifacts/packages/*.*nupkg
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: >-
+          dotnet nuget push "artifacts/packages/*.nupkg"
+          --api-key "$NUGET_API_KEY"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
