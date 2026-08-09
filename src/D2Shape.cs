@@ -32,7 +32,7 @@ public record class D2Shape(
 
     if (!string.IsNullOrWhiteSpace(Icon))
     {
-      properties.Add($"icon: {Icon}");
+      properties.Add($"icon: {D2Writer.String(Icon)}");
     }
 
     if (Shape is not null)
@@ -42,7 +42,7 @@ public record class D2Shape(
 
     if (!string.IsNullOrEmpty(Near))
     {
-      properties.Add($"near: {Near}");
+      properties.Add($"near: {D2Writer.String(Near)}");
     }
 
     if (Style is not null)
@@ -50,7 +50,7 @@ public record class D2Shape(
       properties.AddRange(Style.Lines());
     }
 
-    return Utils.AddLabelAndProperties(Name, Label, properties);
+    return D2Writer.Object(Name, Label, properties);
   }
 
   public override string ToString()
