@@ -48,7 +48,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Restore
-        run: dotnet restore d2lang-cs.sln
+        run: dotnet restore d2lang-cs.slnx
 
       - name: Test
         run: dotnet test test/Tests.csproj --configuration Release --no-restore -p:ContinuousIntegrationBuild=true

@@ -43,10 +43,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore d2lang-cs.sln
+        run: dotnet restore d2lang-cs.slnx
 
       - name: Build
-        run: dotnet build d2lang-cs.sln --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build d2lang-cs.slnx --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Install pinned D2 CLI
         if: runner.os == 'Linux'
@@ -130,7 +130,7 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore d2lang-cs.sln
+        run: dotnet restore d2lang-cs.slnx
 
       - name: Pack core package with package validation
         run: dotnet pack src/d2lang-cs.csproj --configuration Release --no-restore --output artifacts/packages -p:ContinuousIntegrationBuild=true -p:EnablePackageValidation=true

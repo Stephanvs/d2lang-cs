@@ -17,8 +17,8 @@ git switch -c feature/short-description
 Restore, build, and test from the repository root:
 
 ```bash
-dotnet restore d2lang-cs.sln
-dotnet build d2lang-cs.sln --configuration Release --no-restore
+dotnet restore d2lang-cs.slnx
+dotnet build d2lang-cs.slnx --configuration Release --no-restore
 dotnet test test/Tests.csproj --configuration Release --no-build
 ```
 
