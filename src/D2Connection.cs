@@ -2,6 +2,11 @@ using System.Collections;
 
 namespace d2;
 
+/// <summary>Represents a directed or undirected connection between two D2 objects.</summary>
+/// <param name="First">The first endpoint reference.</param>
+/// <param name="Second">The second endpoint reference.</param>
+/// <param name="Direction">The connection direction.</param>
+/// <param name="Label">An optional displayed label.</param>
 public record class D2Connection(
   string First,
   string Second,
@@ -11,6 +16,7 @@ public record class D2Connection(
 {
   private readonly List<D2Statement> _statements = new();
 
+  /// <summary>Gets the additional connection-body statements in serialization order.</summary>
   public IReadOnlyList<D2Statement> Statements => _statements;
 
   /// <summary>An optional icon URL displayed on this connection.</summary>
@@ -25,8 +31,12 @@ public record class D2Connection(
   /// <summary>Optional typed styles for this connection.</summary>
   public D2Style? Style { get; set; }
 
+  /// <summary>Adds a safely serialized property to the connection body.</summary>
+  /// <param name="property">The property to add.</param>
   public void Add(D2Property property) => Add((D2Statement)property);
 
+  /// <summary>Adds a statement to the connection body.</summary>
+  /// <param name="statement">The statement to add.</param>
   public void Add(D2Statement statement)
   {
     if (statement is null)
@@ -78,9 +88,11 @@ public record class D2Connection(
       .Append("}");
   }
 
+  /// <inheritdoc />
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
 
+  /// <inheritdoc />
   public IEnumerator<D2Statement> GetEnumerator() => _statements.GetEnumerator();
 
   IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -2,10 +2,14 @@ using System.Collections;
 
 namespace d2;
 
+/// <summary>Identifies a D2 composition-board collection.</summary>
 public enum D2BoardKind
 {
+  /// <summary>A collection of alternate diagram layers.</summary>
   Layers,
+  /// <summary>A collection of scenarios based on a board.</summary>
   Scenarios,
+  /// <summary>An ordered collection of board steps.</summary>
   Steps,
 }
 
@@ -16,15 +20,22 @@ public sealed record D2BoardCollection : D2Statement, IEnumerable<D2Board>
 {
   private readonly List<D2Board> _boards;
 
+  /// <summary>Gets the kind of boards contained by this collection.</summary>
   public D2BoardKind Kind { get; }
 
+  /// <summary>Gets the boards in their serialization order.</summary>
   public IReadOnlyList<D2Board> Boards => _boards;
 
+  /// <summary>Initializes an empty board collection.</summary>
+  /// <param name="kind">The collection kind.</param>
   public D2BoardCollection(D2BoardKind kind)
     : this(kind, Array.Empty<D2Board>())
   {
   }
 
+  /// <summary>Initializes a collection with a sequence of boards.</summary>
+  /// <param name="kind">The collection kind.</param>
+  /// <param name="boards">The boards to include.</param>
   public D2BoardCollection(D2BoardKind kind, IEnumerable<D2Board> boards)
   {
     if (!Enum.IsDefined(typeof(D2BoardKind), kind))
@@ -45,6 +56,8 @@ public sealed record D2BoardCollection : D2Statement, IEnumerable<D2Board>
     }
   }
 
+  /// <summary>Adds a board to the end of the collection.</summary>
+  /// <param name="board">The board to add.</param>
   public void Add(D2Board board)
   {
     if (board is null)
@@ -58,8 +71,10 @@ public sealed record D2BoardCollection : D2Statement, IEnumerable<D2Board>
   internal override IEnumerable<string> Lines()
     => D2Writer.Block(Keyword(Kind), _boards.SelectMany(board => board.Lines()));
 
+  /// <inheritdoc />
   public override string ToString() => string.Join(Environment.NewLine, Lines());
 
+  /// <inheritdoc />
   public IEnumerator<D2Board> GetEnumerator() => _boards.GetEnumerator();
 
   IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

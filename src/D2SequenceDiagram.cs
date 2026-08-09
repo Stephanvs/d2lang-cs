@@ -24,6 +24,8 @@ public sealed record D2SequenceDiagram : D2Statement, IEnumerable<D2Statement>
   public IReadOnlyList<D2Statement> Statements => _statements;
 
   /// <summary>Creates an empty sequence diagram.</summary>
+  /// <param name="name">The sequence diagram key or dotted path.</param>
+  /// <param name="label">An optional displayed label.</param>
   public D2SequenceDiagram(string name, string? label = null)
   {
     _ = D2Writer.Reference(name);
@@ -32,6 +34,7 @@ public sealed record D2SequenceDiagram : D2Statement, IEnumerable<D2Statement>
   }
 
   /// <summary>Adds an ordered statement. Supports collection initializer syntax.</summary>
+  /// <param name="statement">The statement to add.</param>
   public void Add(D2Statement statement)
   {
     if (statement is null) throw new ArgumentNullException(nameof(statement));
@@ -39,6 +42,10 @@ public sealed record D2SequenceDiagram : D2Statement, IEnumerable<D2Statement>
   }
 
   /// <summary>Adds an actor or participant and returns this diagram.</summary>
+  /// <param name="name">The participant key.</param>
+  /// <param name="label">An optional displayed participant label.</param>
+  /// <param name="shape">An optional participant shape.</param>
+  /// <returns>This sequence diagram for continued fluent configuration.</returns>
   public D2SequenceDiagram AddParticipant(string name, string? label = null, Shape? shape = null)
   {
     Add(new D2Shape(name, label, shape));
@@ -46,6 +53,11 @@ public sealed record D2SequenceDiagram : D2Statement, IEnumerable<D2Statement>
   }
 
   /// <summary>Adds an ordered message and returns this diagram.</summary>
+  /// <param name="first">The first participant reference.</param>
+  /// <param name="second">The second participant reference.</param>
+  /// <param name="label">An optional message label.</param>
+  /// <param name="direction">The message direction; defaults to <see cref="Direction.To"/>.</param>
+  /// <returns>This sequence diagram for continued fluent configuration.</returns>
   public D2SequenceDiagram AddMessage(
     string first,
     string second,
@@ -57,6 +69,9 @@ public sealed record D2SequenceDiagram : D2Statement, IEnumerable<D2Statement>
   }
 
   /// <summary>Adds a labeled sequence group and returns this diagram.</summary>
+  /// <param name="name">The group key.</param>
+  /// <param name="statements">The ordered statements inside the group.</param>
+  /// <returns>This sequence diagram for continued fluent configuration.</returns>
   public D2SequenceDiagram AddGroup(string name, params D2Statement[] statements)
   {
     if (statements is null) throw new ArgumentNullException(nameof(statements));

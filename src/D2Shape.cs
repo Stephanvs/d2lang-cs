@@ -18,6 +18,7 @@ public record class D2Shape(
 {
   private readonly List<D2Statement> _statements = new();
 
+  /// <summary>Gets the shape-body statements in serialization order.</summary>
   public IReadOnlyList<D2Statement> Statements => _statements;
 
   /// <summary>An optional icon URL.</summary>
@@ -35,12 +36,20 @@ public record class D2Shape(
   /// <summary>An optional fixed height for a non-container shape.</summary>
   public int? Height { get; set; }
 
+  /// <summary>Adds a nested shape. Supports collection initializer syntax.</summary>
+  /// <param name="shape">The nested shape to add.</param>
   public void Add(D2Shape shape) => Add((D2Statement)shape);
 
+  /// <summary>Adds a connection to this shape's body.</summary>
+  /// <param name="connection">The connection to add.</param>
   public void Add(D2Connection connection) => Add((D2Statement)connection);
 
+  /// <summary>Adds a block-string statement to this shape's body.</summary>
+  /// <param name="text">The block-string statement to add.</param>
   public void Add(D2Text text) => Add((D2Statement)text);
 
+  /// <summary>Adds any supported statement to this shape's body.</summary>
+  /// <param name="statement">The statement to add.</param>
   public void Add(D2Statement statement)
   {
     if (statement is null)
@@ -91,9 +100,11 @@ public record class D2Shape(
     return D2Writer.Object(Name, Label, properties);
   }
 
+  /// <inheritdoc />
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
 
+  /// <inheritdoc />
   public IEnumerator<D2Shape> GetEnumerator()
     => _statements.OfType<D2Shape>().GetEnumerator();
 
