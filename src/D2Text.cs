@@ -13,7 +13,7 @@ public record D2Text(
 
     return new List<string>()
       .Append($"{Property}:{sep}{Format}")
-      .Concat(Text.Split(Environment.NewLine))
+      .Concat(Text.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
       .Append(sep);
   }
 
