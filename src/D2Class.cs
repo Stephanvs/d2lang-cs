@@ -42,7 +42,7 @@ public sealed record D2ClassParameter
 }
 
 /// <summary>A field or method in a typed <see cref="D2Class"/>.</summary>
-public abstract record D2ClassMember : D2Statement
+public abstract class D2ClassMember
 {
   /// <summary>The UML visibility of the member.</summary>
   public D2Visibility Visibility { get; }
@@ -60,7 +60,7 @@ public abstract record D2ClassMember : D2Statement
 
   private protected abstract string? Result { get; }
 
-  internal override IEnumerable<string> Lines()
+  internal IEnumerable<string> Lines()
   {
     var displayKey = VisibilityPrefix(Visibility) + Signature;
     var key = Visibility == D2Visibility.Default && this is D2ClassField
@@ -85,7 +85,7 @@ public abstract record D2ClassMember : D2Statement
 }
 
 /// <summary>A typed field in a D2 UML class.</summary>
-public sealed record D2ClassField : D2ClassMember
+public sealed class D2ClassField : D2ClassMember
 {
   /// <summary>The field name.</summary>
   public string Name { get; }
@@ -109,7 +109,7 @@ public sealed record D2ClassField : D2ClassMember
 }
 
 /// <summary>A typed method in a D2 UML class.</summary>
-public sealed record D2ClassMethod : D2ClassMember
+public sealed class D2ClassMethod : D2ClassMember
 {
   /// <summary>The method name.</summary>
   public string Name { get; }
@@ -191,7 +191,7 @@ public sealed record D2Class : D2Statement, IEnumerable<D2ClassMember>
       Link = Link,
       Tooltip = Tooltip,
     };
-    foreach (var member in _members) shape.Add(member);
+    foreach (var member in _members) shape.Add(new MemberStatement(member));
     return shape.Lines();
   }
 
@@ -202,4 +202,9 @@ public sealed record D2Class : D2Statement, IEnumerable<D2ClassMember>
   public IEnumerator<D2ClassMember> GetEnumerator() => _members.GetEnumerator();
 
   IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+  private sealed record MemberStatement(D2ClassMember Member) : D2Statement
+  {
+    internal override IEnumerable<string> Lines() => Member.Lines();
+  }
 }
