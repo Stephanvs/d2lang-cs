@@ -1,6 +1,6 @@
 namespace d2;
 
-public static class Utils
+internal static class Utils
 {
   public static string StringifyBoolean(bool? value) => D2Writer.Boolean(value is true);
 
