@@ -149,7 +149,7 @@ jobs:
         shell: bash
         run: |
           dotnet new console --framework net10.0 --output artifacts/package-smoke --no-restore
-          dotnet add artifacts/package-smoke/package-smoke.csproj package d2lang-cs --source "$PWD/artifacts/packages"
+          dotnet add artifacts/package-smoke/package-smoke.csproj package d2lang-cs --prerelease --source "$PWD/artifacts/packages"
           dotnet build artifacts/package-smoke/package-smoke.csproj --configuration Release --no-restore
 
       - name: Upload package
