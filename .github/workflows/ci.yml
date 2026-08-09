@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  D2_VERSION: 0.7.1
+
+jobs:
+  build-and-test:
+    name: Build and test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore d2lang-cs.sln
+
+      - name: Build
+        run: dotnet build d2lang-cs.sln --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Install pinned D2 CLI
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          archive="$RUNNER_TEMP/d2-v${D2_VERSION}-linux-amd64.tar.gz"
+          install_dir="$RUNNER_TEMP/d2-cli"
+          curl --proto '=https' --tlsv1.2 --location --fail --silent --show-error \
+            "https://github.com/d2lang/d2/releases/download/v${D2_VERSION}/d2-v${D2_VERSION}-linux-amd64.tar.gz" \
+            --output "$archive"
+          echo "eb172adf59f38d1e5a70ab177591356754ffaf9bebb84e0ca8b767dfb421dad7  $archive" | sha256sum --check --strict
+          mkdir -p "$install_dir"
+          tar -xzf "$archive" --strip-components=1 -C "$install_dir"
+          echo "$install_dir/bin" >> "$GITHUB_PATH"
+
+      - name: Test with coverage
+        run: dotnet test test/Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=tests.trx" --collect "XPlat Code Coverage" --results-directory artifacts/test-results/${{ runner.os }}
+
+      - name: Add coverage summary
+        if: always()
+        shell: pwsh
+        run: |
+          $coveragePath = Get-ChildItem "artifacts/test-results/${{ runner.os }}" -Filter coverage.cobertura.xml -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($null -eq $coveragePath) {
+            "## Coverage (${{ runner.os }})`n`nCoverage report was not produced." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            exit 0
+          }
+
+          [xml] $coverage = Get-Content $coveragePath.FullName
+          $lineRate = [double]::Parse($coverage.coverage.'line-rate', [Globalization.CultureInfo]::InvariantCulture)
+          $branchRate = [double]::Parse($coverage.coverage.'branch-rate', [Globalization.CultureInfo]::InvariantCulture)
+          $linePercent = [Math]::Round($lineRate * 100, 2)
+          $branchPercent = [Math]::Round($branchRate * 100, 2)
+          $summary = "## Coverage (${{ runner.os }})`n`n| Metric | Coverage |`n| --- | ---: |`n| Lines | $linePercent% |`n| Branches | $branchPercent% |"
+          $summary | Out-File -FilePath "artifacts/test-results/${{ runner.os }}/coverage-summary.md"
+          $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: test-results-${{ runner.os }}
+          path: artifacts/test-results/${{ runner.os }}/**/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-${{ runner.os }}
+          path: |
+            artifacts/test-results/${{ runner.os }}/**/coverage.cobertura.xml
+            artifacts/test-results/${{ runner.os }}/coverage-summary.md
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Validate generated D2 syntax
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          d2 version
+          dotnet run --project example/cli/d2-sample-cli.csproj --configuration Release --no-build > artifacts/example.d2
+          d2 validate artifacts/example.d2
+
+  package:
+    name: Validate NuGet package
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore src/d2lang-cs.csproj
+
+      - name: Pack with package validation
+        run: dotnet pack src/d2lang-cs.csproj --configuration Release --no-restore --output artifacts/packages -p:ContinuousIntegrationBuild=true -p:EnablePackageValidation=true
+
+      - name: Inspect package contents
+        shell: bash
+        run: |
+          package_path=$(find artifacts/packages -maxdepth 1 -name '*.nupkg' ! -name '*.snupkg' -print -quit)
+          test -n "$package_path"
+          unzip -l "$package_path" | tee artifacts/package-contents.txt
+          grep -q 'lib/net10.0/d2lang-cs.dll' artifacts/package-contents.txt
+          grep -q 'README.md' artifacts/package-contents.txt
+          grep -q 'd2_logo.png' artifacts/package-contents.txt
+
+      - name: Install package in a clean consumer project
+        shell: bash
+        run: |
+          dotnet new console --framework net10.0 --output artifacts/package-smoke --no-restore
+          dotnet add artifacts/package-smoke/package-smoke.csproj package d2lang-cs --source "$PWD/artifacts/packages"
+          dotnet build artifacts/package-smoke/package-smoke.csproj --configuration Release --no-restore
+
+      - name: Upload package
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nuget-package
+          path: |
+            artifacts/packages/*.nupkg
+            artifacts/package-contents.txt
+          if-no-files-found: error
+          retention-days: 14
