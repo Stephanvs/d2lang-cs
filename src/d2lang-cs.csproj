@@ -5,6 +5,8 @@
     <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ApiCompatPermitUnnecessarySuppressions Condition="'$(TargetFrameworks)' == ''">true</ApiCompatPermitUnnecessarySuppressions>
     <RootNamespace>d2</RootNamespace>
 
     <!-- Release builds override Version from the release tag with -p:Version=<version>. -->
