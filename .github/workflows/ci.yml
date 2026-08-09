@@ -130,26 +130,40 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore src/d2lang-cs.csproj
+        run: dotnet restore d2lang-cs.sln
 
-      - name: Pack with package validation
+      - name: Pack core package with package validation
         run: dotnet pack src/d2lang-cs.csproj --configuration Release --no-restore --output artifacts/packages -p:ContinuousIntegrationBuild=true -p:EnablePackageValidation=true
+
+      - name: Pack Entity Framework Core integration
+        run: dotnet pack src/D2Lang.EntityFrameworkCore/D2Lang.EntityFrameworkCore.csproj --configuration Release --no-restore --output artifacts/packages -p:ContinuousIntegrationBuild=true -p:EnablePackageValidation=true
 
       - name: Inspect package contents
         shell: bash
         run: |
-          package_path=$(find artifacts/packages -maxdepth 1 -name '*.nupkg' ! -name '*.snupkg' -print -quit)
-          test -n "$package_path"
-          unzip -l "$package_path" | tee artifacts/package-contents.txt
-          grep -q 'lib/net10.0/d2lang-cs.dll' artifacts/package-contents.txt
-          grep -q 'README.md' artifacts/package-contents.txt
-          grep -q 'd2_logo.png' artifacts/package-contents.txt
+          core_package_path=$(find artifacts/packages -maxdepth 1 -iname 'd2lang-cs.*.nupkg' ! -name '*.snupkg' -print -quit)
+          efcore_package_path=$(find artifacts/packages -maxdepth 1 -iname 'd2lang.entityframeworkcore.*.nupkg' ! -name '*.snupkg' -print -quit)
+          test -n "$core_package_path"
+          test -n "$efcore_package_path"
+
+          unzip -l "$core_package_path" | tee artifacts/core-package-contents.txt
+          grep -q 'lib/net10.0/d2lang-cs.dll' artifacts/core-package-contents.txt
+          grep -q 'README.md' artifacts/core-package-contents.txt
+          grep -q 'd2_logo.png' artifacts/core-package-contents.txt
+
+          unzip -l "$efcore_package_path" | tee artifacts/efcore-package-contents.txt
+          grep -q 'lib/net8.0/D2Lang.EntityFrameworkCore.dll' artifacts/efcore-package-contents.txt
+          grep -q 'lib/net10.0/D2Lang.EntityFrameworkCore.dll' artifacts/efcore-package-contents.txt
+          grep -q 'README.md' artifacts/efcore-package-contents.txt
+          grep -q 'd2_logo.png' artifacts/efcore-package-contents.txt
 
       - name: Install package in a clean consumer project
         shell: bash
         run: |
           dotnet new console --framework net10.0 --output artifacts/package-smoke --no-restore
-          dotnet add artifacts/package-smoke/package-smoke.csproj package d2lang-cs --prerelease --source "$PWD/artifacts/packages"
+          dotnet new nugetconfig --output artifacts/package-smoke --force
+          dotnet nuget add source "$PWD/artifacts/packages" --name local-packages --configfile artifacts/package-smoke/nuget.config
+          dotnet add artifacts/package-smoke/package-smoke.csproj package D2Lang.EntityFrameworkCore --prerelease
           dotnet build artifacts/package-smoke/package-smoke.csproj --configuration Release --no-restore
 
       - name: Upload package
@@ -158,6 +172,7 @@ jobs:
           name: nuget-package
           path: |
             artifacts/packages/*.nupkg
-            artifacts/package-contents.txt
+            artifacts/core-package-contents.txt
+            artifacts/efcore-package-contents.txt
           if-no-files-found: error
           retention-days: 14

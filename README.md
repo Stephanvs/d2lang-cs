@@ -152,6 +152,25 @@ var import = new D2RawStatement("...@architecture.d2");
 
 For Markdown, LaTeX, and other D2 block strings, use `D2Text`. It normalizes line endings and automatically lengthens the pipe delimiter when the contents would otherwise close the block.
 
+## Entity Framework Core integration
+
+Install the separate `D2Lang.EntityFrameworkCore` package to keep a D2 database diagram synchronized with an EF Core relational model:
+
+```bash
+dotnet add package D2Lang.EntityFrameworkCore
+```
+
+Chain schema generation after the normal context registration:
+
+```csharp
+builder.Services
+    .AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("Database")))
+    .AddD2Schema<AppDbContext>("docs/database-schema.d2");
+```
+
+The integration writes the diagram when the host starts, without connecting to the database, and leaves an unchanged file untouched. It includes tables, columns, provider store types, nullability, primary and unique keys, foreign keys, and relationship edges. Applications without a generic host can call `dbContext.ToD2Diagram()` directly.
+
 ## Supported features
 
 - Shapes, nested containers, the modeled D2 shape kinds, icons, dimensions, links, tooltips, and relative placement

@@ -39,6 +39,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- The EF Core integration is a separate project and NuGet package. -->
+    <Compile Remove="D2Lang.EntityFrameworkCore/**/*.cs" />
+
     <None Include="../docs/assets/img/banner.png" Pack="true" PackagePath="docs/assets/img/" />
     <None Include="../docs/assets/img/diagram.png" Pack="true" PackagePath="docs/assets/img/" />
     <None Include="../docs/assets/img/d2_logo.png" Pack="true" PackagePath="" />
