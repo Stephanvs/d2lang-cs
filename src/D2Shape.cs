@@ -8,27 +8,33 @@ public record class D2Shape(
   Shape? Shape = default,
   D2Style? Style = default,
   string? Near = default
-) : IEnumerable<D2Shape>, IEnumerable<D2Connection>, IEnumerable<D2Text>
+) : D2Statement, IEnumerable<D2Shape>, IEnumerable<D2Connection>, IEnumerable<D2Text>
 {
-  private readonly List<D2Shape> _shapes = new();
-  private readonly List<D2Connection> _connections = new();
-  private readonly List<D2Text> _texts = new();
+  private readonly List<D2Statement> _statements = new();
+
+  public IReadOnlyList<D2Statement> Statements => _statements;
 
   public string Icon { get; set; } = string.Empty;
 
-  public void Add(D2Shape shape) => _shapes.Add(shape);
+  public void Add(D2Shape shape) => Add((D2Statement)shape);
 
-  public void Add(D2Connection connection) => _connections.Add(connection);
+  public void Add(D2Connection connection) => Add((D2Statement)connection);
 
-  public void Add(D2Text text) => _texts.Add(text);
+  public void Add(D2Text text) => Add((D2Statement)text);
 
-  internal IEnumerable<string> Lines()
+  public void Add(D2Statement statement)
   {
-    var shapes = _shapes.SelectMany(s => s.Lines()).ToList();
-    var connections = _connections.SelectMany(c => c.Lines()).ToList();
-    var texts = _texts.SelectMany(t => t.Lines()).ToList();
+    if (statement is null)
+    {
+      throw new ArgumentNullException(nameof(statement));
+    }
 
-    var properties = shapes.Concat(connections).Concat(texts).ToList();
+    _statements.Add(statement);
+  }
+
+  internal override IEnumerable<string> Lines()
+  {
+    var properties = _statements.SelectMany(statement => statement.Lines()).ToList();
 
     if (!string.IsNullOrWhiteSpace(Icon))
     {
@@ -40,9 +46,9 @@ public record class D2Shape(
       properties.Add($"shape: {Shape}");
     }
 
-    if (!string.IsNullOrEmpty(Near))
+    if (Near is { Length: > 0 } near)
     {
-      properties.Add($"near: {D2Writer.String(Near)}");
+      properties.Add($"near: {D2Writer.String(near)}");
     }
 
     if (Style is not null)
@@ -56,15 +62,15 @@ public record class D2Shape(
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
 
-    public IEnumerator<D2Shape> GetEnumerator()
-		=> _shapes.GetEnumerator();
+  public IEnumerator<D2Shape> GetEnumerator()
+    => _statements.OfType<D2Shape>().GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-		=> GetEnumerator();
+  IEnumerator IEnumerable.GetEnumerator()
+    => GetEnumerator();
 
-    IEnumerator<D2Text> IEnumerable<D2Text>.GetEnumerator()
-		=> _texts.GetEnumerator();
+  IEnumerator<D2Text> IEnumerable<D2Text>.GetEnumerator()
+    => _statements.OfType<D2Text>().GetEnumerator();
 
-    IEnumerator<D2Connection> IEnumerable<D2Connection>.GetEnumerator()
-		=> _connections.GetEnumerator();
+  IEnumerator<D2Connection> IEnumerable<D2Connection>.GetEnumerator()
+    => _statements.OfType<D2Connection>().GetEnumerator();
 }

@@ -28,7 +28,23 @@ internal static class D2Writer
     // A dot is meaningful in D2: it navigates to a nested object. Quote each
     // segment independently so path semantics survive without allowing a
     // segment's contents to become syntax.
-    return string.Join(".", value.Split('.').Select(IdentifierSegment));
+    var segments = value.Split('.');
+    if (segments.Any(string.IsNullOrWhiteSpace))
+    {
+      throw new ArgumentException("A D2 reference cannot contain an empty path segment.", nameof(value));
+    }
+
+    return string.Join(".", segments.Select(IdentifierSegment));
+  }
+
+  internal static string Identifier(string value)
+  {
+    if (string.IsNullOrWhiteSpace(value))
+    {
+      throw new ArgumentException("A D2 identifier cannot be null, empty, or whitespace.", nameof(value));
+    }
+
+    return IdentifierSegment(value);
   }
 
   internal static string String(string value)
@@ -45,7 +61,31 @@ internal static class D2Writer
 
   internal static string Integer(int value) => value.ToString(CultureInfo.InvariantCulture);
 
-  internal static string Number(double value) => value.ToString("R", CultureInfo.InvariantCulture);
+  internal static string Number(double value)
+  {
+    if (double.IsNaN(value) || double.IsInfinity(value))
+    {
+      throw new ArgumentOutOfRangeException(nameof(value), value, "A D2 number must be finite.");
+    }
+
+    return value.ToString("R", CultureInfo.InvariantCulture);
+  }
+
+  internal static IEnumerable<string> Block(string name, IEnumerable<string> statements)
+    => BlockSerialized(Reference(name), statements);
+
+  internal static IEnumerable<string> BlockIdentifier(string name, IEnumerable<string> statements)
+    => BlockSerialized(Identifier(name), statements);
+
+  private static IEnumerable<string> BlockSerialized(string name, IEnumerable<string> statements)
+  {
+    if (statements is null)
+    {
+      throw new ArgumentNullException(nameof(statements));
+    }
+
+    return new[] { $"{name}: {{" }.Concat(Indent(statements)).Append("}");
+  }
 
   internal static IEnumerable<string> Object(
     string name,

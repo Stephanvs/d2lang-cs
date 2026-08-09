@@ -5,9 +5,9 @@ public record D2Text(
   string Text,
   string Format,
   int Pipes
-)
+) : D2Statement
 {
-  internal IEnumerable<string> Lines()
+  internal override IEnumerable<string> Lines()
   {
     if (Pipes < 1)
     {

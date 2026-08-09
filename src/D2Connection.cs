@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace d2;
 
 public record class D2Connection(
@@ -5,19 +7,48 @@ public record class D2Connection(
   string Second,
   Direction Direction,
   string? Label = ""
-)
+) : D2Statement, IEnumerable<D2Statement>
 {
-  internal IEnumerable<string> Lines()
+  private readonly List<D2Statement> _statements = new();
+
+  public IReadOnlyList<D2Statement> Statements => _statements;
+
+  public void Add(D2Property property) => Add((D2Statement)property);
+
+  public void Add(D2Statement statement)
   {
-    var @base = $"{D2Writer.Reference(First)} {Direction} {D2Writer.Reference(Second)}";
-    if (!string.IsNullOrWhiteSpace(Label))
+    if (statement is null)
     {
-      @base += $": {D2Writer.String(Label)}";
+      throw new ArgumentNullException(nameof(statement));
     }
 
-    return new List<string> { @base };
+    _statements.Add(statement);
+  }
+
+  internal override IEnumerable<string> Lines()
+  {
+    var @base = $"{D2Writer.Reference(First)} {Direction} {D2Writer.Reference(Second)}";
+    var hasLabel = !string.IsNullOrWhiteSpace(Label);
+    if (hasLabel)
+    {
+      @base += $": {D2Writer.String(Label!)}";
+    }
+
+    if (_statements.Count == 0)
+    {
+      return new[] { @base };
+    }
+
+    var openingLine = hasLabel ? $"{@base} {{" : $"{@base}: {{";
+    return new[] { openingLine }
+      .Concat(D2Writer.Indent(_statements.SelectMany(statement => statement.Lines())))
+      .Append("}");
   }
 
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
+
+  public IEnumerator<D2Statement> GetEnumerator() => _statements.GetEnumerator();
+
+  IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
