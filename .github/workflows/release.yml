@@ -53,9 +53,21 @@ jobs:
       - name: Test
         run: dotnet test test/Tests.csproj --configuration Release --no-restore -p:ContinuousIntegrationBuild=true
 
-      - name: Pack with package validation
+      - name: Pack core package with package validation
         run: >-
           dotnet pack src/d2lang-cs.csproj
+          --configuration Release
+          --no-restore
+          --output artifacts/packages
+          -p:PackageVersion=${{ steps.package.outputs.version }}
+          -p:ContinuousIntegrationBuild=true
+          -p:EnablePackageValidation=true
+          -p:IncludeSymbols=true
+          -p:SymbolPackageFormat=snupkg
+
+      - name: Pack Entity Framework Core integration
+        run: >-
+          dotnet pack src/D2Lang.EntityFrameworkCore/D2Lang.EntityFrameworkCore.csproj
           --configuration Release
           --no-restore
           --output artifacts/packages
@@ -68,7 +80,7 @@ jobs:
       - name: Upload release packages
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: d2lang-cs-${{ steps.package.outputs.version }}
+          name: d2lang-packages-${{ steps.package.outputs.version }}
           path: artifacts/packages/*.*nupkg
           if-no-files-found: error
           retention-days: 30

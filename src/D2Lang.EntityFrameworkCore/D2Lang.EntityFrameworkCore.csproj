@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <RootNamespace>d2.EntityFrameworkCore</RootNamespace>
+
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>local</VersionSuffix>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <DebugType>portable</DebugType>
+    <EnableSourceLink>true</EnableSourceLink>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+
+    <PackageId>D2Lang.EntityFrameworkCore</PackageId>
+    <Title>D2 for Entity Framework Core</Title>
+    <Authors>Stephan van Stekelenburg</Authors>
+    <Copyright>Copyright (c) Stephan van Stekelenburg</Copyright>
+    <RepositoryUrl>https://github.com/Stephanvs/d2lang-cs.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/Stephanvs/d2lang-cs</PackageProjectUrl>
+    <PackageTags>D2;Entity Framework Core;EF Core;Database;Schema;Diagram</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Generate D2 SQL-table diagrams automatically from Entity Framework Core relational models.</Description>
+    <PackageIcon>d2_logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.29" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../d2lang-cs.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="../../docs/assets/img/d2_logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

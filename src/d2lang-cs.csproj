@@ -1,30 +1,51 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0;net10.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <ApiCompatPermitUnnecessarySuppressions Condition="'$(TargetFrameworks)' == ''">true</ApiCompatPermitUnnecessarySuppressions>
     <RootNamespace>d2</RootNamespace>
+
+    <!-- Release builds override Version from the release tag with -p:Version=<version>. -->
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionSuffix>local</VersionSuffix>
+
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <DebugType>portable</DebugType>
+    <EnableSourceLink>true</EnableSourceLink>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion>
+
     <PackageId>d2lang-cs</PackageId>
-    <Version>1.0.0</Version>
+    <Title>D2 for .NET</Title>
     <Authors>Stephan van Stekelenburg</Authors>
+    <Copyright>Copyright (c) Stephan van Stekelenburg</Copyright>
     <RepositoryUrl>https://github.com/Stephanvs/d2lang-cs.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/Stephanvs/d2lang-cs</PackageProjectUrl>
     <PackageTags>D2;D2 Lang;Declarative Diagramming;Diagram;Text Diagram;Text to Diagram</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>D2 is A modern, open-source DSL designed specifically for software architecture diagrams.</Description>
+    <Description>A .NET library for generating diagrams in D2, the modern declarative diagramming language.</Description>
     <PackageIcon>d2_logo.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- copy resources into nupkg -->
-    <None Include="../docs/assets/img/banner.png" Pack="true" PackagePath="\docs\assets\img\banner.png" />
-    <None Include="../docs/assets/img/diagram.png" Pack="true" PackagePath="\docs\assets\img\diagram.png" />
-    <None Include="../docs/assets/img/d2_logo.png" Pack="true" PackagePath="\" />
-    <None Include="../README.md" Pack="true" PackagePath="\"/>
+    <!-- The EF Core integration is a separate project and NuGet package. -->
+    <Compile Remove="D2Lang.EntityFrameworkCore/**/*.cs" />
+
+    <None Include="../docs/assets/img/banner.png" Pack="true" PackagePath="docs/assets/img/" />
+    <None Include="../docs/assets/img/diagram.png" Pack="true" PackagePath="docs/assets/img/" />
+    <None Include="../docs/assets/img/d2_logo.png" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

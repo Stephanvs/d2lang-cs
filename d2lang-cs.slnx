@@ -3,5 +3,6 @@
     <Project Path="example/cli/d2-sample-cli.csproj" />
   </Folder>
   <Project Path="src/d2lang-cs.csproj" />
+  <Project Path="src/D2Lang.EntityFrameworkCore/D2Lang.EntityFrameworkCore.csproj" />
   <Project Path="test/Tests.csproj" />
 </Solution>
