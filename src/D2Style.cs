@@ -78,6 +78,7 @@ public record class D2Style(
   D2TextTransform? TextTransform = null)
 {
   /// <summary>Serializes this style as a D2 <c>style</c> block.</summary>
+  /// <returns>The serialized lines of the style block, or an empty sequence when no values are set.</returns>
   public IEnumerable<string> Lines()
   {
     ValidateRange(StrokeWidth, 1, 15, nameof(StrokeWidth));

@@ -22,6 +22,7 @@ public sealed record D2SqlConstraint
 
   /// <summary>Creates a custom SQL constraint value.</summary>
   /// <param name="value">The constraint text shown by D2.</param>
+  /// <returns>A constraint containing the supplied value.</returns>
   public static D2SqlConstraint Custom(string value)
   {
     if (string.IsNullOrWhiteSpace(value))
@@ -48,6 +49,9 @@ public sealed record D2SqlColumn : D2Statement
   public IReadOnlyList<D2SqlConstraint> Constraints { get; }
 
   /// <summary>Creates a SQL column.</summary>
+  /// <param name="name">The column key.</param>
+  /// <param name="type">The SQL type displayed by D2.</param>
+  /// <param name="constraints">The column constraints.</param>
   public D2SqlColumn(string name, string type, params D2SqlConstraint[] constraints)
   {
     _ = D2Writer.Identifier(name);
@@ -107,6 +111,8 @@ public sealed record D2SqlTable : D2Statement, IEnumerable<D2SqlColumn>
   public IReadOnlyList<D2SqlColumn> Columns => _columns;
 
   /// <summary>Creates an empty SQL table.</summary>
+  /// <param name="name">The table key or dotted path.</param>
+  /// <param name="label">An optional displayed table label.</param>
   public D2SqlTable(string name, string? label = null)
   {
     _ = D2Writer.Reference(name);
@@ -115,6 +121,7 @@ public sealed record D2SqlTable : D2Statement, IEnumerable<D2SqlColumn>
   }
 
   /// <summary>Adds a typed column. Supports collection initializer syntax.</summary>
+  /// <param name="column">The column to add.</param>
   public void Add(D2SqlColumn column)
   {
     if (column is null) throw new ArgumentNullException(nameof(column));

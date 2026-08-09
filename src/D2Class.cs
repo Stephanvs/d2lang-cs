@@ -24,6 +24,8 @@ public sealed record D2ClassParameter
   public string Type { get; }
 
   /// <summary>Creates a class method parameter.</summary>
+  /// <param name="name">The parameter name.</param>
+  /// <param name="type">The parameter type displayed by D2.</param>
   public D2ClassParameter(string name, string type)
   {
     _ = D2Writer.Identifier(name);
@@ -91,6 +93,9 @@ public sealed class D2ClassField : D2ClassMember
   public string? Type { get; }
 
   /// <summary>Creates a class field.</summary>
+  /// <param name="name">The field name.</param>
+  /// <param name="type">The optional field type.</param>
+  /// <param name="visibility">The UML visibility prefix.</param>
   public D2ClassField(string name, string? type = null, D2Visibility visibility = D2Visibility.Default)
     : base(visibility)
   {
@@ -114,6 +119,10 @@ public sealed class D2ClassMethod : D2ClassMember
   public IReadOnlyList<D2ClassParameter> Parameters { get; }
 
   /// <summary>Creates a class method.</summary>
+  /// <param name="name">The method name.</param>
+  /// <param name="returnType">The optional return type; <see langword="null"/> represents void.</param>
+  /// <param name="visibility">The UML visibility prefix.</param>
+  /// <param name="parameters">The method parameters in display order.</param>
   public D2ClassMethod(
     string name,
     string? returnType = null,
@@ -158,6 +167,8 @@ public sealed record D2Class : D2Statement, IEnumerable<D2ClassMember>
   public IReadOnlyList<D2ClassMember> Members => _members;
 
   /// <summary>Creates an empty UML class.</summary>
+  /// <param name="name">The class key or dotted path.</param>
+  /// <param name="label">An optional displayed class label.</param>
   public D2Class(string name, string? label = null)
   {
     _ = D2Writer.Reference(name);
@@ -166,6 +177,7 @@ public sealed record D2Class : D2Statement, IEnumerable<D2ClassMember>
   }
 
   /// <summary>Adds a typed member. Supports collection initializer syntax.</summary>
+  /// <param name="member">The field or method to add.</param>
   public void Add(D2ClassMember member)
   {
     if (member is null) throw new ArgumentNullException(nameof(member));

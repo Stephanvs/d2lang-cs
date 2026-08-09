@@ -1,5 +1,10 @@
 namespace d2;
 
+/// <summary>Represents a formatted D2 block string assigned to a property.</summary>
+/// <param name="Property">The target property name or dotted path.</param>
+/// <param name="Text">The block-string contents.</param>
+/// <param name="Format">The D2 block-string format, such as <c>md</c> or <c>latex</c>.</param>
+/// <param name="Pipes">The minimum number of pipe characters in the delimiter.</param>
 public record D2Text(
   string Property,
   string Text,
@@ -39,6 +44,7 @@ public record D2Text(
       or >= '0' and <= '9'
       or '_' or '-';
 
+  /// <inheritdoc />
   public override string ToString()
     => string.Join(Environment.NewLine, Lines());
 }
