@@ -1,0 +1,12 @@
+Blogs: {
+  Id: INTEGER NOT NULL { constraint: primary_key }
+  Name: TEXT NOT NULL
+  shape: sql_table
+}
+Posts: {
+  Id: INTEGER NOT NULL { constraint: primary_key }
+  BlogId: INTEGER NOT NULL { constraint: foreign_key }
+  Title: TEXT NOT NULL
+  shape: sql_table
+}
+Posts.BlogId -> Blogs.Id
