@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/example/">
+    <Project Path="example/cli/d2-sample-cli.csproj" />
+  </Folder>
+  <Project Path="src/d2lang-cs.csproj" />
+  <Project Path="test/Tests.csproj" />
+</Solution>
