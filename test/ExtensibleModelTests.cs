@@ -14,7 +14,7 @@ public class ExtensibleModelTests
       new D2Property("direction", "right"),
       new D2Shape("actor", "Actor"),
       new D2Comment("the request happens next"),
-      new D2Connection("actor", "service", Direction.TO, "request"),
+      new D2Connection("actor", "service", Direction.To, "request"),
       new D2Shape("service", "Service"),
     });
 
@@ -35,9 +35,9 @@ public class ExtensibleModelTests
     {
       new D2Shape("user", "User"),
       new D2Shape("api", "API"),
-      new D2Connection("user", "api", Direction.TO, "sign in"),
+      new D2Connection("user", "api", Direction.To, "sign in"),
       new D2Comment("the response must remain after the request"),
-      new D2Connection("api", "user", Direction.TO, "session"),
+      new D2Connection("api", "user", Direction.To, "session"),
     };
 
     Assert.AreEqual(
@@ -109,7 +109,7 @@ public class ExtensibleModelTests
   [TestMethod]
   public void Connection_SupportsOrderedGenericProperties()
   {
-    var connection = new D2Connection("client", "server", Direction.TO, "call")
+    var connection = new D2Connection("client", "server", Direction.To, "call")
     {
       new D2Property("style", new D2Statement[]
       {
@@ -139,7 +139,7 @@ public class ExtensibleModelTests
     var steps = new D2BoardCollection(D2BoardKind.Steps)
     {
       new D2Board("1") { new D2Shape("queued", null) },
-      new D2Board("2") { new D2Connection("queued", "done", Direction.TO) },
+      new D2Board("2") { new D2Connection("queued", "done", Direction.To) },
     };
     var scenarios = new D2BoardCollection(D2BoardKind.Scenarios)
     {
@@ -154,7 +154,7 @@ public class ExtensibleModelTests
       new D2Board("detail")
       {
         new D2Property("direction", "right"),
-        new D2Connection("client", "worker", Direction.TO),
+        new D2Connection("client", "worker", Direction.To),
         scenarios,
       },
     };
@@ -201,7 +201,7 @@ public class ExtensibleModelTests
   [TestMethod]
   public void ExtensibleDocument_PassesD2ValidationWhenCliIsAvailable()
   {
-    var connection = new D2Connection("client", "server", Direction.TO, "calls # safely")
+    var connection = new D2Connection("client", "server", Direction.To, "calls # safely")
     {
       new D2Property("style", new D2Statement[]
       {
@@ -220,7 +220,7 @@ public class ExtensibleModelTests
         {
           new D2Board("failover")
           {
-            new D2Connection("database", "replica", Direction.TO, "replicates"),
+            new D2Connection("database", "replica", Direction.To, "replicates"),
           },
         },
       },

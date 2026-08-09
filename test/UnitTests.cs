@@ -18,7 +18,7 @@ public class UnitTests
       new D2Shape("deepmind", "DeepMind", Shape.Rectangle),
     };
 
-    var connection = new D2Connection(company.Name, umbrella.Name, Direction.TO, "BELONGS_TO");
+    var connection = new D2Connection(company.Name, umbrella.Name, Direction.To, "BELONGS_TO");
 
     var diagram = new D2Diagram(new[] { umbrella, company }, new[] { connection });
     var expected = Lines(
@@ -87,7 +87,7 @@ public class UnitTests
     var connection = new D2Connection(
       "source.node",
       "target # node",
-      Direction.BOTH,
+      Direction.Both,
       "uses: \"secure\" ${token}");
 
     Assert.AreEqual(
@@ -179,7 +179,7 @@ public class UnitTests
     var target = new D2Shape("target#2", "Target: database", Shape.Cylinder);
     var diagram = new D2Diagram(
       new[] { source, target },
-      new[] { new D2Connection(source.Name, target.Name, Direction.TO, "calls # safely") });
+      new[] { new D2Connection(source.Name, target.Name, Direction.To, "calls # safely") });
 
     var path = Path.Combine(Path.GetTempPath(), $"d2lang-cs-{Guid.NewGuid():N}.d2");
     File.WriteAllText(path, diagram.ToString());

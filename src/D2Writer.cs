@@ -18,6 +18,14 @@ internal static class D2Writer
     "^[\\p{L}\\p{N}_][\\p{L}\\p{N} _./-]*$",
     RegexOptions.CultureInvariant | RegexOptions.Compiled);
 
+  private static readonly HashSet<string> ReservedObjectKeys = new(
+    new[]
+    {
+      "class", "constraint", "direction", "height", "icon", "label", "link",
+      "near", "shape", "style", "tooltip", "width",
+    },
+    StringComparer.OrdinalIgnoreCase);
+
   internal static string Reference(string value)
   {
     if (string.IsNullOrWhiteSpace(value))
@@ -45,6 +53,12 @@ internal static class D2Writer
     }
 
     return IdentifierSegment(value);
+  }
+
+  internal static string ObjectMemberIdentifier(string value)
+  {
+    var identifier = Identifier(value);
+    return ReservedObjectKeys.Contains(value) ? Quoted(value) : identifier;
   }
 
   internal static string String(string value)
