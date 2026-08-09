@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/example/">
     <Project Path="example/cli/d2-sample-cli.csproj" />
+    <Project Path="example/entity-framework-core/d2-sample-ef-core.csproj" />
   </Folder>
   <Project Path="src/d2lang-cs.csproj" />
   <Project Path="src/D2Lang.EntityFrameworkCore/D2Lang.EntityFrameworkCore.csproj" />
