@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <ApiCompatPermitUnnecessarySuppressions Condition="'$(TargetFrameworks)' == ''">true</ApiCompatPermitUnnecessarySuppressions>
     <RootNamespace>d2</RootNamespace>
     <PackageId>d2lang-cs</PackageId>
     <Version>1.0.0</Version>
