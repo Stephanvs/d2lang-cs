@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dotnet-patches:
+        patterns:
+          - Microsoft.EntityFrameworkCore.*
+          - Microsoft.Extensions.*
+        update-types:
+          - minor
+          - patch
+      test-tooling:
+        patterns:
+          - Microsoft.NET.Test.Sdk
+          - MSTest.*
+          - coverlet.collector
+        update-types:
+          - minor
+          - patch
+    # Preserve matching EF Core major versions for each target framework.
+    ignore:
+      - dependency-name: Microsoft.EntityFrameworkCore.*
+        update-types:
+          - version-update:semver-major
+      - dependency-name: Microsoft.Extensions.*
+        update-types:
+          - version-update:semver-major
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
