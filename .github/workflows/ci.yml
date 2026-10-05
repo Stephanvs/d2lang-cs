@@ -17,7 +17,7 @@ concurrency:
 env:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_NOLOGO: "1"
-  D2_VERSION: 0.7.1
+  D2_VERSION: 0.9.0
 
 jobs:
   build-and-test:
@@ -57,7 +57,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 --location --fail --silent --show-error \
             "https://github.com/d2lang/d2/releases/download/v${D2_VERSION}/d2-v${D2_VERSION}-linux-amd64.tar.gz" \
             --output "$archive"
-          echo "eb172adf59f38d1e5a70ab177591356754ffaf9bebb84e0ca8b767dfb421dad7  $archive" | sha256sum --check --strict
+          echo "5669ddc46b99e942cc96078f4a4e36d5e62103348f4c05179ede27802fdd87a9  $archive" | sha256sum --check --strict
           mkdir -p "$install_dir"
           tar -xzf "$archive" --strip-components=1 -C "$install_dir"
           echo "$install_dir/bin" >> "$GITHUB_PATH"

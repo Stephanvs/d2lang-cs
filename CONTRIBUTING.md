@@ -4,7 +4,7 @@ Thanks for helping improve `d2lang-cs`. Focused pull requests with tests are the
 
 ## Development setup
 
-Install the stable [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and the [.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0) to run the compatibility tests. The D2 CLI is optional for normal library development and required when checking generated D2 syntax locally. CI currently uses D2 CLI `v0.7.1`.
+Install the stable [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and the [.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0) to run the compatibility tests. The D2 CLI is optional for normal library development and required when checking generated D2 syntax locally. CI currently uses D2 CLI `v0.9.0`.
 
 Fork and clone the repository, then create a branch from `main`:
 
