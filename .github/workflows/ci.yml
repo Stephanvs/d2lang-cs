@@ -21,7 +21,7 @@ env:
 
 jobs:
   build-and-test:
-    name: Build and test (${{ matrix.os }})
+    name: Build and test (${{ matrix.os }}, ${{ matrix.framework }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:
@@ -30,17 +30,22 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+        framework:
+          - net8.0
+          - net10.0
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Restore
         run: dotnet restore d2lang-cs.slnx
@@ -63,15 +68,15 @@ jobs:
           echo "$install_dir/bin" >> "$GITHUB_PATH"
 
       - name: Test with coverage
-        run: dotnet test test/Tests.csproj --configuration Release --no-build --logger "trx;LogFileName=tests.trx" --collect "XPlat Code Coverage" --results-directory artifacts/test-results/${{ runner.os }}
+        run: dotnet test test/Tests.csproj --configuration Release --no-build --framework ${{ matrix.framework }} --logger "trx;LogFileName=tests.trx" --collect "XPlat Code Coverage" --results-directory artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}
 
       - name: Add coverage summary
         if: always()
         shell: pwsh
         run: |
-          $coveragePath = Get-ChildItem "artifacts/test-results/${{ runner.os }}" -Filter coverage.cobertura.xml -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          $coveragePath = Get-ChildItem "artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}" -Filter coverage.cobertura.xml -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           if ($null -eq $coveragePath) {
-            "## Coverage (${{ runner.os }})`n`nCoverage report was not produced." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+            "## Coverage (${{ runner.os }}, ${{ matrix.framework }})`n`nCoverage report was not produced." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
             exit 0
           }
 
@@ -80,16 +85,16 @@ jobs:
           $branchRate = [double]::Parse($coverage.coverage.'branch-rate', [Globalization.CultureInfo]::InvariantCulture)
           $linePercent = [Math]::Round($lineRate * 100, 2)
           $branchPercent = [Math]::Round($branchRate * 100, 2)
-          $summary = "## Coverage (${{ runner.os }})`n`n| Metric | Coverage |`n| --- | ---: |`n| Lines | $linePercent% |`n| Branches | $branchPercent% |"
-          $summary | Out-File -FilePath "artifacts/test-results/${{ runner.os }}/coverage-summary.md"
+          $summary = "## Coverage (${{ runner.os }}, ${{ matrix.framework }})`n`n| Metric | Coverage |`n| --- | ---: |`n| Lines | $linePercent% |`n| Branches | $branchPercent% |"
+          $summary | Out-File -FilePath "artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}/coverage-summary.md"
           $summary | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: test-results-${{ runner.os }}
-          path: artifacts/test-results/${{ runner.os }}/**/*.trx
+          name: test-results-${{ runner.os }}-${{ matrix.framework }}
+          path: artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}/**/*.trx
           if-no-files-found: warn
           retention-days: 14
 
@@ -97,15 +102,15 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: coverage-${{ runner.os }}
+          name: coverage-${{ runner.os }}-${{ matrix.framework }}
           path: |
-            artifacts/test-results/${{ runner.os }}/**/coverage.cobertura.xml
-            artifacts/test-results/${{ runner.os }}/coverage-summary.md
+            artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}/**/coverage.cobertura.xml
+            artifacts/test-results/${{ runner.os }}/${{ matrix.framework }}/coverage-summary.md
           if-no-files-found: warn
           retention-days: 14
 
       - name: Validate generated D2 syntax
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.framework == 'net10.0'
         shell: bash
         run: |
           d2 version
@@ -120,12 +125,12 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x
 
