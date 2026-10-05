@@ -14,6 +14,8 @@ dotnet add package d2lang-cs
 
 The package provides `netstandard2.0`, `net8.0`, and `net10.0` assets. Applications can therefore use the broad .NET Standard library surface or target the current supported .NET LTS releases directly.
 
+.NET 10 LTS is the recommended target for new applications. Existing .NET 8 and .NET Standard 2.0 assets are retained for compatibility. Microsoft support for .NET 8 ends on [November 10, 2026](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core); any future removal of an existing target will be treated as a breaking change and reserved for a major package release.
+
 ## Quick start
 
 ```csharp
@@ -191,7 +193,7 @@ Rendering and layout remain the responsibility of D2 itself. A renderer-process 
 
 ## Development
 
-Build and test with the .NET SDK selected by `global.json`:
+Build with the stable .NET 10 SDK selected by `global.json`. The test suite runs on both .NET 8 and .NET 10, so install both runtimes:
 
 ```bash
 dotnet restore

@@ -4,7 +4,7 @@ Thanks for helping improve `d2lang-cs`. Focused pull requests with tests are the
 
 ## Development setup
 
-Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). The D2 CLI is optional for normal library development and required when checking generated D2 syntax locally. CI currently uses D2 CLI `v0.7.1`.
+Install the stable [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) and the [.NET 8 runtime](https://dotnet.microsoft.com/download/dotnet/8.0) to run the compatibility tests. The D2 CLI is optional for normal library development and required when checking generated D2 syntax locally. CI currently uses D2 CLI `v0.7.1`.
 
 Fork and clone the repository, then create a branch from `main`:
 
@@ -22,10 +22,14 @@ dotnet build d2lang-cs.slnx --configuration Release --no-restore
 dotnet test test/Tests.csproj --configuration Release --no-build
 ```
 
-Create the NuGet package with SDK package validation enabled:
+Create both NuGet packages with SDK package validation enabled:
 
 ```bash
 dotnet pack src/d2lang-cs.csproj \
+  --configuration Release \
+  --output artifacts/packages \
+  -p:EnablePackageValidation=true
+dotnet pack src/D2Lang.EntityFrameworkCore/D2Lang.EntityFrameworkCore.csproj \
   --configuration Release \
   --output artifacts/packages \
   -p:EnablePackageValidation=true
@@ -59,8 +63,8 @@ Pull requests run clean builds and tests on Linux and Windows. CI also publishes
 Releases are published by `.github/workflows/release.yml`. Maintainers should:
 
 1. Confirm the intended commit is on `main` and CI is green.
-2. Confirm the `nuget.org` GitHub environment is protected as desired and contains a `NUGET_API_KEY` secret scoped to the `d2lang-cs` package.
-3. Choose an unused semantic version such as `1.2.3` or `1.2.3-rc.1`.
+2. Confirm the `nuget.org` GitHub environment is protected as desired and contains a `NUGET_API_KEY` secret with permission to publish both `d2lang-cs` and `D2Lang.EntityFrameworkCore`. Include permission to create the EF Core package for its first release.
+3. Choose a semantic version unused by both packages, such as `1.2.3` or `1.2.3-rc.1`. A release tag publishes both packages with the same version.
 4. Create an annotated `v`-prefixed tag and push it:
 
    ```bash
@@ -68,6 +72,6 @@ Releases are published by `.github/workflows/release.yml`. Maintainers should:
    git push origin v1.2.3
    ```
 
-5. Review the `Publish NuGet package` workflow and its package artifact before confirming the package on NuGet.org.
+5. Review the `Publish NuGet package` workflow and its package artifacts, then verify that both packages and their symbols are available on NuGet.org.
 
 The workflow derives `PackageVersion` from the tag, repeats tests, enables SDK package validation, creates `.nupkg` and `.snupkg` artifacts, and publishes with `dotnet nuget push`. Publishing uses read-only repository permissions and exposes `NUGET_API_KEY` only to the final push step. Duplicate versions are skipped safely, but NuGet package versions are immutable; use a new version if published contents need to change.
